@@ -22,6 +22,24 @@ import Control.Monad.Failure
 import Data.Maybe
 import Data.Typeable
 
+
+{-| @def@, use it to return a default value in the event of an error.
+
+   E.g. you can define a version of @tail@ which returns a default
+   value when the list is empty
+
+>  tailDef defaultValue = def defaultValue . tail
+-}
+
+def :: a -> Maybe a -> a
+def v = fromMaybe v
+
+{-| @note@, use it to fail with an annotated runtime error
+-}
+
+note :: Exception e => String -> Either e a -> a
+note msg = either (\e -> error (show e ++ ": " ++ msg)) id
+
 data SafeException = forall e. Exception e => SafeException e
   deriving (Typeable)
 instance Show SafeException where
