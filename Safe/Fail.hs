@@ -50,7 +50,7 @@ safeExceptionToException :: Exception e => e -> SomeException
 safeExceptionToException   = toException . SafeException
 
 safeExceptionFromException :: Exception e => SomeException -> Maybe e
-safeExceptionFromException e = do { SafeException e <- fromException e; cast e}
+safeExceptionFromException e = do { SafeException e' <- fromException e; cast e'}
 
 liftFail :: MonadFail e m => (a -> Bool) -> e -> (a -> b) -> a -> m b
 liftFail test e f val = if test val then failure e else return (f val)

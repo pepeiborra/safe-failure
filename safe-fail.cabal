@@ -18,3 +18,4 @@ Description:
     your code.
 Exposed-modules:
 	Safe.Fail
+ghc-options: -Wall
