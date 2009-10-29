@@ -147,8 +147,9 @@ at xs n
    | n < 0 = failure (IndexFail n)
    | otherwise = go xs n
   where
-    go [] _    = failure (IndexFail n)
-    go (x:_) 0 = return x
+    go [] _     = failure (IndexFail n)
+    go (x:_)  0 = return x
+    go (_:xx) i = go xx (i-1)
 
 
 data ReadFail = ReadFail String deriving (Show,Typeable)
@@ -157,12 +158,9 @@ instance Exception ReadFail where
   toException   = safeExceptionToException
 
 read :: (Read a, MonadFail ReadFail m) => String -> m a
-read s = maybe (failure (ReadFail s)) return (readMay s)
-  where
-    readMay s = case [x | (x,t) <- reads s, ("","") <- lex t] of
-                [x] -> Just x
-                _ -> Nothing
-
+read s =  case [x | (x,t) <- reads s, ("","") <- lex t] of
+                [x] -> return x
+                _   -> failure (ReadFail s)
 
 data LookupFail a = LookupFail a deriving (Show,Typeable)
 instance (Typeable a, Show a) => Exception (LookupFail a) where
