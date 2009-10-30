@@ -1,4 +1,4 @@
-Name:           safe-fail
+Name:           safe-failure
 Build-Type:     Simple
 Version:        0.2
 License:        BSD3
@@ -17,5 +17,5 @@ Description:
     These functions can be used to reduce the number of unsafe pattern matches in
     your code.
 Exposed-modules:
-	Safe.Fail
+	Safe.Failure
 ghc-options: -Wall

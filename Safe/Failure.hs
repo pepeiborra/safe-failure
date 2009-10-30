@@ -11,11 +11,11 @@ Stability   :  in-progress
 Portability :  portable
 
 A library for safe functions, based on standard functions that may crash.
-This module reexports versions which produce exceptions in an arbitrary MonadFail monad.
+This module reexports versions which produce exceptions in an arbitrary MonadFailure monad.
 
 -}
 
-module Safe.Fail where
+module Safe.Failure where
 
 import Control.Exception
 import Control.Monad.Failure
@@ -52,7 +52,7 @@ safeExceptionToException   = toException . SafeException
 safeExceptionFromException :: Exception e => SomeException -> Maybe e
 safeExceptionFromException e = do { SafeException e' <- fromException e; cast e'}
 
-liftFail :: MonadFail e m => (a -> Bool) -> e -> (a -> b) -> a -> m b
+liftFail :: MonadFailure e m => (a -> Bool) -> e -> (a -> b) -> a -> m b
 liftFail test e f val = if test val then failure e else return (f val)
 
 
@@ -61,7 +61,7 @@ instance Exception TailFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-tail :: MonadFail TailFail m => [a] -> m [a]
+tail :: MonadFailure TailFail m => [a] -> m [a]
 tail = liftFail null TailFail Prelude.tail
 
 
@@ -70,7 +70,7 @@ instance Exception InitFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-init :: MonadFail InitFail m => [a] -> m [a]
+init :: MonadFailure InitFail m => [a] -> m [a]
 init = liftFail null InitFail Prelude.init
 
 
@@ -79,7 +79,7 @@ instance Exception HeadFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-head :: MonadFail HeadFail m => [a] -> m a
+head :: MonadFailure HeadFail m => [a] -> m a
 head = liftFail null HeadFail Prelude.head
 
 
@@ -88,7 +88,7 @@ instance Exception LastFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-last :: MonadFail LastFail m => [a] -> m a
+last :: MonadFailure LastFail m => [a] -> m a
 last = liftFail null LastFail Prelude.last
 
 
@@ -97,7 +97,7 @@ instance Exception MinimumFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-minimum  :: (Ord a, MonadFail MinimumFail m) => [a] -> m a
+minimum  :: (Ord a, MonadFailure MinimumFail m) => [a] -> m a
 minimum  = liftFail null MinimumFail Prelude.minimum
 
 
@@ -106,7 +106,7 @@ instance Exception MaximumFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-maximum  :: (Ord a, MonadFail MaximumFail m) => [a] -> m a
+maximum  :: (Ord a, MonadFailure MaximumFail m) => [a] -> m a
 maximum  = liftFail null MaximumFail Prelude.maximum
 
 
@@ -115,7 +115,7 @@ instance Exception Foldr1Fail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-foldr1  :: MonadFail Foldr1Fail m => (a -> a -> a) -> [a] -> m a
+foldr1  :: MonadFailure Foldr1Fail m => (a -> a -> a) -> [a] -> m a
 foldr1 f = liftFail null Foldr1Fail (Prelude.foldr1 f)
 
 
@@ -124,7 +124,7 @@ instance Exception Foldl1Fail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-foldl1  :: MonadFail Foldl1Fail m => (a -> a -> a) -> [a] -> m a
+foldl1  :: MonadFailure Foldl1Fail m => (a -> a -> a) -> [a] -> m a
 foldl1 f = liftFail null Foldl1Fail (Prelude.foldl1 f)
 
 
@@ -133,7 +133,7 @@ instance Exception FromJustFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-fromJust :: MonadFail FromJustFail m => Maybe a -> m a
+fromJust :: MonadFailure FromJustFail m => Maybe a -> m a
 fromJust  = liftFail isNothing FromJustFail Data.Maybe.fromJust
 
 
@@ -142,7 +142,7 @@ instance Exception IndexFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-at :: MonadFail IndexFail m => [a] -> Int -> m a
+at :: MonadFailure IndexFail m => [a] -> Int -> m a
 at xs n
    | n < 0 = failure (IndexFail n)
    | otherwise = go xs n
@@ -157,7 +157,7 @@ instance Exception ReadFail where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-read :: (Read a, MonadFail ReadFail m) => String -> m a
+read :: (Read a, MonadFailure ReadFail m) => String -> m a
 read s =  case [x | (x,t) <- reads s, ("","") <- lex t] of
                 [x] -> return x
                 _   -> failure (ReadFail s)
@@ -169,6 +169,6 @@ instance (Typeable a, Show a) => Exception (LookupFail a) where
 
 -- |
 -- > lookupJust key = fromJust . lookup key
-lookup :: (Eq a, MonadFail (LookupFail a) m) => a -> [(a,b)] -> m b
+lookup :: (Eq a, MonadFailure (LookupFail a) m) => a -> [(a,b)] -> m b
 lookup key = maybe (failure (LookupFail key)) return . Prelude.lookup key
 
