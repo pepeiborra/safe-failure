@@ -3,9 +3,9 @@ Build-Type:     Simple
 Version:        0.2
 License:        BSD3
 License-File:   LICENSE
-Copyright:      2007-8, Neil Mitchell, 2009 Jose Iborra
+Copyright:      2007-8, Neil Mitchell
 Maintainer:     pepeiborra@gmail.com
-Author:         Neil Mitchell, Jose Iborra
+Author:         Neil Mitchell, Jose Iborra (2009), Michael Snoyman (2009)
 Homepage:       http://www-users.cs.york.ac.uk/~ndm/safe/
 Build-Depends:  base >= 4, control-monad-failure
 Category:       Unclassified
