@@ -8,16 +8,38 @@ Module      :  Safe.Fail
 Copyright   :  (c) Neil Mitchell 2007-2008, Jose Iborra 2009
 License     :  BSD3
 
-Maintainer  :  http://community.haskell.org/~ndm/
+Maintainer  :  pepeiborra@gmail.com
 Stability   :  in-progress
 Portability :  portable
 
 A library for safe functions, based on standard functions that may crash.
-This module reexports versions which produce exceptions in an arbitrary MonadFailure monad.
+
+This module reexports versions which produce exceptions in an arbitrary 'MonadFailure' monad.
 
 -}
 
-module Safe.Failure where
+module Safe.Failure (
+-- * List Functions
+Safe.Failure.head, Safe.Failure.tail,
+Safe.Failure.init, Safe.Failure.last,
+Safe.Failure.minimum, Safe.Failure.maximum,
+Safe.Failure.foldr1, Safe.Failure.foldl1,
+Safe.Failure.at, Safe.Failure.lookup,
+-- * Maybe functions
+Safe.Failure.fromJust,
+-- * Other Prelude functions
+Safe.Failure.read,
+-- * Useful combinators
+def, note,
+-- * Exceptions
+SafeException(..),
+HeadFailure(..), TailFailure(..), InitFailure(..), LastFailure(..),
+MaximumFailure(..), MinimumFailure(..),
+Foldl1Failure(..), Foldr1Failure(..),
+IndexFailure(..), LookupFailure(..),
+FromJustFailure(..),
+ReadFailure(..),
+) where
 
 import Control.Exception
 import Control.Monad.Failure
