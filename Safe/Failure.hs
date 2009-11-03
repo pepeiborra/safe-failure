@@ -23,9 +23,11 @@ import Control.Exception
 import Control.Monad.Failure
 import Data.Maybe
 import Data.Typeable
+import Control.Monad.Trans
 #ifdef CME
 import Control.Monad.Exception.Throws
 #endif
+import Control.Monad (liftM)
 
 {-| @def@, use it to return a default value in the event of an error.
 
@@ -176,6 +178,25 @@ instance (Typeable a, Show a) => Exception (LookupFailure a) where
 lookup :: (Eq a, MonadFailure (LookupFailure a) m) => a -> [(a,b)] -> m b
 lookup key = maybe (failure (LookupFailure key)) return . Prelude.lookup key
 
+-- | Assert a value to be true. If true, returns the first value as a succss.
+-- Otherwise, returns the second value as a failure.
+assert :: (MonadFailure e m, Exception e)
+       => Bool
+       -> v
+       -> e
+       -> m v
+assert b v e = if b then return v else failure e
+
+-- | The standard readFile function with any 'IOException's returned as a
+-- failure instead of a runtime exception.
+readFile :: (MonadFailure IOException m, MonadIO m) => FilePath -> m String
+readFile fp = do
+    contents <- liftIO $ handle
+                    (\e -> return $ Left (e :: IOException))
+                    (liftM Right $ Prelude.readFile fp)
+    case contents of
+        Left e -> failure e
+        Right v -> return v
 
 #ifdef CME
 

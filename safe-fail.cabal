@@ -23,7 +23,7 @@ Flag cme
 
 Library
    buildable: True
-   build-depends:  base >= 4, control-monad-failure
+   build-depends:  base >= 4, control-monad-failure, transformers
    exposed-modules:  
       Safe.Failure
    ghc-options: -Wall
