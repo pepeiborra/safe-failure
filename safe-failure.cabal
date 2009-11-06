@@ -1,7 +1,7 @@
 Name:           safe-failure
 Build-Type:     Simple
 Cabal-Version:  >= 1.2
-Version:        0.2
+Version:        0.1
 License:        BSD3
 License-File:   LICENSE
 Copyright:      2007-8, Neil Mitchell
@@ -9,10 +9,10 @@ Maintainer:     pepeiborra@gmail.com
 Author:         Neil Mitchell, Jose Iborra (2009), Michael Snoyman (2009)
 Homepage:       http://www-users.cs.york.ac.uk/~ndm/safe/
 Category:       Unclassified
-Synopsis:       Library for safe (pattern match free) functions
+Synopsis:       Library for safe functions
 Description:
     Partial functions from the base library, such as @head@ and @!!@, modified
-    to fail in a @MonadFail@ monad.
+    to fail in a @MonadFailure@ monad.
     
     These functions can be used to reduce the number of unsafe pattern matches in
     your code.
