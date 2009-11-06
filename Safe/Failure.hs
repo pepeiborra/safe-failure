@@ -31,6 +31,10 @@ Safe.Failure.fromJust,
 Safe.Failure.read,
 -- * Useful combinators
 def, note,
+-- * Assertions
+Safe.Failure.assert,
+-- * IO functions
+Safe.Failure.readFile,
 -- * Exceptions
 SafeException(..),
 HeadFailure(..), TailFailure(..), InitFailure(..), LastFailure(..),
