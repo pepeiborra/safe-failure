@@ -46,7 +46,7 @@ ReadFailure(..),
 ) where
 
 import Control.Exception
-import Control.Monad.Failure
+import Control.Failure
 import Data.Maybe
 import Data.Typeable
 import Control.Monad.Trans

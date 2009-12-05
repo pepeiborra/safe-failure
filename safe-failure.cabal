@@ -1,14 +1,14 @@
 Name:           safe-failure
 Build-Type:     Simple
 Cabal-Version:  >= 1.2
-Version:        0.2
+Version:        0.4.0
 License:        BSD3
 License-File:   LICENSE
 Copyright:      2007-8, Neil Mitchell
 Maintainer:     pepeiborra@gmail.com
 Author:         Neil Mitchell, Jose Iborra (2009), Michael Snoyman (2009)
 Homepage:       http://www-users.cs.york.ac.uk/~ndm/safe/
-Category:       Unclassified
+Category:       Failure
 Synopsis:       Library for safe functions
 Description:
     Partial functions from the base library, such as @head@ and @!!@, modified
@@ -23,10 +23,12 @@ Flag cme
 
 Library
    buildable: True
-   build-depends:  base >= 4, control-monad-failure, transformers
+   build-depends:  base >= 4,
+                   failure >= 0.0.0 && < 0.1,
+                   transformers >= 0.1.4.0 && < 0.2
    exposed-modules:  
       Safe.Failure
    ghc-options: -Wall
    if flag(cme)
-     build-depends: control-monad-exception
+     build-depends: control-monad-exception >= 0.5 && < 0.6
      cpp-options: -DCME
