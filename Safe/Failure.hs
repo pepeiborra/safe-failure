@@ -2,7 +2,6 @@
 {-# LANGUAGE ExistentialQuantification #-}
 {-# LANGUAGE FlexibleContexts, FlexibleInstances #-}
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE CPP #-}
 {- |
 Module      :  Safe.Fail
 Copyright   :  (c) Neil Mitchell 2007-2008, Jose Iborra 2009
@@ -33,8 +32,6 @@ Safe.Failure.read,
 def, note,
 -- * Assertions
 Safe.Failure.assert,
--- * IO functions
-Safe.Failure.readFile,
 -- * Exceptions
 SafeException(..),
 HeadFailure(..), TailFailure(..), InitFailure(..), LastFailure(..),
@@ -49,11 +46,6 @@ import Control.Exception
 import Control.Failure
 import Data.Maybe
 import Data.Typeable
-import Control.Monad.Trans
-#ifdef CME
-import Control.Monad.Exception.Throws
-#endif
-import Control.Monad (liftM)
 
 {-| @def@, use it to return a default value in the event of an error.
 
@@ -212,33 +204,3 @@ assert :: (MonadFailure e m, Exception e)
        -> e
        -> m v
 assert b v e = if b then return v else failure e
-
--- | The standard readFile function with any 'IOException's returned as a
--- failure instead of a runtime exception.
-readFile :: (MonadFailure IOException m, MonadIO m) => FilePath -> m String
-readFile fp = do
-    contents <- liftIO $ handle
-                    (\e -> return $ Left (e :: IOException))
-                    (liftM Right $ Prelude.readFile fp)
-    case contents of
-        Left e -> failure e
-        Right v -> return v
-
-#ifdef CME
-
--- Encoding the exception hierarchy in Throws
-
-instance Throws TailFailure (Caught SafeException l)
-instance Throws HeadFailure (Caught SafeException l)
-instance Throws InitFailure (Caught SafeException l)
-instance Throws LastFailure (Caught SafeException l)
-instance Throws MinimumFailure (Caught SafeException l)
-instance Throws MaximumFailure (Caught SafeException l)
-instance Throws Foldr1Failure (Caught SafeException l)
-instance Throws Foldl1Failure (Caught SafeException l)
-instance Throws FromJustFailure (Caught SafeException l)
-instance Throws IndexFailure (Caught SafeException l)
-instance Throws ReadFailure (Caught SafeException l)
-instance (Typeable a, Show a) => Throws (LookupFailure a) (Caught SafeException l)
-
-#endif
