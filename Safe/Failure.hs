@@ -46,7 +46,6 @@ import Control.Exception
 import Control.Failure
 import Data.Maybe
 import Data.Typeable
-import Control.Applicative (pure)
 
 {-| @def@, use it to return a default value in the event of an error.
 
@@ -77,13 +76,13 @@ safeExceptionToException   = toException . SafeException
 safeExceptionFromException :: Exception e => SomeException -> Maybe e
 safeExceptionFromException e = do { SafeException e' <- fromException e; cast e'}
 
-liftFailure :: ApplicativeFailure e m
+liftFailure :: Failure e m
             => (a -> Bool)
             -> e
             -> (a -> b)
             -> a
             -> m b
-liftFailure test e f val = if test val then failure e else pure (f val)
+liftFailure test e f val = if test val then failure e else return (f val)
 
 
 data TailFailure = TailFailure deriving (Show,Typeable)
@@ -91,7 +90,7 @@ instance Exception TailFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-tail :: ApplicativeFailure TailFailure m => [a] -> m [a]
+tail :: Failure TailFailure m => [a] -> m [a]
 tail = liftFailure null TailFailure Prelude.tail
 
 
@@ -100,7 +99,7 @@ instance Exception InitFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-init :: ApplicativeFailure InitFailure m => [a] -> m [a]
+init :: Failure InitFailure m => [a] -> m [a]
 init = liftFailure null InitFailure Prelude.init
 
 
@@ -109,7 +108,7 @@ instance Exception HeadFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-head :: ApplicativeFailure HeadFailure m => [a] -> m a
+head :: Failure HeadFailure m => [a] -> m a
 head = liftFailure null HeadFailure Prelude.head
 
 
@@ -118,7 +117,7 @@ instance Exception LastFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-last :: ApplicativeFailure LastFailure m => [a] -> m a
+last :: Failure LastFailure m => [a] -> m a
 last = liftFailure null LastFailure Prelude.last
 
 
@@ -127,7 +126,7 @@ instance Exception MinimumFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-minimum  :: (Ord a, ApplicativeFailure MinimumFailure m) => [a] -> m a
+minimum  :: (Ord a, Failure MinimumFailure m) => [a] -> m a
 minimum  = liftFailure null MinimumFailure Prelude.minimum
 
 
@@ -136,7 +135,7 @@ instance Exception MaximumFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-maximum  :: (Ord a, ApplicativeFailure MaximumFailure m) => [a] -> m a
+maximum  :: (Ord a, Failure MaximumFailure m) => [a] -> m a
 maximum  = liftFailure null MaximumFailure Prelude.maximum
 
 
@@ -145,7 +144,7 @@ instance Exception Foldr1Failure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-foldr1  :: ApplicativeFailure Foldr1Failure m => (a -> a -> a) -> [a] -> m a
+foldr1  :: Failure Foldr1Failure m => (a -> a -> a) -> [a] -> m a
 foldr1 f = liftFailure null Foldr1Failure (Prelude.foldr1 f)
 
 
@@ -154,7 +153,7 @@ instance Exception Foldl1Failure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-foldl1  :: ApplicativeFailure Foldl1Failure m => (a -> a -> a) -> [a] -> m a
+foldl1  :: Failure Foldl1Failure m => (a -> a -> a) -> [a] -> m a
 foldl1 f = liftFailure null Foldl1Failure (Prelude.foldl1 f)
 
 
@@ -163,7 +162,7 @@ instance Exception FromJustFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-fromJust :: ApplicativeFailure FromJustFailure m => Maybe a -> m a
+fromJust :: Failure FromJustFailure m => Maybe a -> m a
 fromJust  = liftFailure isNothing FromJustFailure Data.Maybe.fromJust
 
 
@@ -172,13 +171,13 @@ instance Exception IndexFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-at :: ApplicativeFailure IndexFailure m => [a] -> Int -> m a
+at :: Failure IndexFailure m => [a] -> Int -> m a
 at xs n
    | n < 0 = failure (IndexFailure n)
    | otherwise = go xs n
   where
     go [] _     = failure (IndexFailure n)
-    go (x:_)  0 = pure x
+    go (x:_)  0 = return x
     go (_:xx) i = go xx (i-1)
 
 
@@ -187,9 +186,9 @@ instance Exception ReadFailure where
   fromException = safeExceptionFromException
   toException   = safeExceptionToException
 
-read :: (Read a, ApplicativeFailure ReadFailure m) => String -> m a
+read :: (Read a, Failure ReadFailure m) => String -> m a
 read s =  case [x | (x,t) <- reads s, ("","") <- lex t] of
-                [x] -> pure x
+                [x] -> return x
                 _   -> failure (ReadFailure s)
 
 data LookupFailure a = LookupFailure a deriving (Show,Typeable)
@@ -199,15 +198,15 @@ instance (Typeable a, Show a) => Exception (LookupFailure a) where
 
 -- |
 -- > lookupJust key = fromJust . lookup key
-lookup :: (Eq a, ApplicativeFailure (LookupFailure a) m)
+lookup :: (Eq a, Failure (LookupFailure a) m)
        => a -> [(a,b)] -> m b
-lookup key = maybe (failure (LookupFailure key)) pure . Prelude.lookup key
+lookup key = maybe (failure (LookupFailure key)) return . Prelude.lookup key
 
 -- | Assert a value to be true. If true, returns the first value as a succss.
 -- Otherwise, returns the second value as a failure.
-assert :: (ApplicativeFailure e m, Exception e)
+assert :: (Failure e m, Exception e)
        => Bool
        -> v
        -> e
        -> m v
-assert b v e = if b then pure v else failure e
+assert b v e = if b then return v else failure e

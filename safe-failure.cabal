@@ -1,7 +1,7 @@
 Name:           safe-failure
 Build-Type:     Simple
 Cabal-Version:  >= 1.2
-Version:        0.4.0
+Version:        0.5.0
 License:        BSD3
 License-File:   LICENSE
 Copyright:      2007-8, Neil Mitchell
@@ -20,7 +20,7 @@ Description:
 Library
    buildable: True
    build-depends:  base >= 4 && < 5,
-                   failure >= 0.0.0 && < 0.1
+                   failure >= 0.1.0 && < 0.2
    exposed-modules:  
       Safe.Failure
    ghc-options: -Wall
